@@ -7,11 +7,24 @@
 
 using namespace std;
 
+float rand01() {
+	return ((float)rand() / (RAND_MAX + 1));
+}
+
+vec3 random_in_unit_sphere() {
+	vec3 p;
+	do {
+		p = 2.0f * vec3(rand01(), rand01(), rand01()) - vec3(1, 1, 1);
+	} while (p.squared_length() >= 1.0f);
+	return p;
+}
+
 vec3 color(const ray& r, hitable *world) {
 	hit_record rec;
 
-	if (world->hit(r, 0.0f, FLT_MAX, rec)) {
-		return 0.5f * vec3(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
+	if (world->hit(r, 0.001f, FLT_MAX, rec)) {
+		vec3 target = rec.p + rec.normal + random_in_unit_sphere();
+		return 0.5f * color(ray(rec.p, target - rec.p), world);
 	}
 
 	vec3 unit_direction = unit_vector(r.direction());
@@ -20,9 +33,9 @@ vec3 color(const ray& r, hitable *world) {
 }
 
 int main() {
-	int nx = 256;
-	int ny = 128;
-	int ns = 64;
+	int nx = 512;
+	int ny = 256;
+	int ns = 32;
 
 	ofstream outfile;
 	outfile.open("HelloWorld.ppm");
@@ -39,8 +52,8 @@ int main() {
 		{
 			vec3 col(0, 0, 0);
 			for (int s = 0; s < ns; ++s) {
-				float u = float(i + ((double)rand() / (RAND_MAX + 1))) / float(nx);
-				float v = float(j + ((double)rand() / (RAND_MAX + 1))) / float(ny);
+				float u = float(i + rand01()) / float(nx);
+				float v = float(j + rand01()) / float(ny);
 
 				ray r = cam.get_ray(u, v);
 
@@ -48,6 +61,7 @@ int main() {
 				//vec3 p = r.point_at_parameter(2.0f);
 			}
 			col /= float(ns);
+			col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
 
 			int ir = int(255.99 * col[0]);
 			int ig = int(255.99 * col[1]);
