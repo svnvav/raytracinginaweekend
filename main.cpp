@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "sphere.h"
+#include "camera.h"
 #include "hitable_list.h"
 #include "float.h"
 
@@ -19,33 +20,34 @@ vec3 color(const ray& r, hitable *world) {
 }
 
 int main() {
-	int nx = 200;
-	int ny = 100;
+	int nx = 256;
+	int ny = 128;
+	int ns = 64;
 
 	ofstream outfile;
 	outfile.open("HelloWorld.ppm");
 	outfile << "P3\n" << nx << " " << ny << "\n255\n";
-
-	vec3 lower_left_corner(-2.0f, -1.0f, -1.0f);
-	vec3 horizontal(4.0f, .0f, .0f);
-	vec3 vertical(.0f, 2.0f, .0f);
-	vec3 origin(.0f, .0f, .0f);
 
 	hitable *list[2];
 	list[0] = new sphere(vec3(0, 0, -1), 0.5f);
 	list[1] = new sphere(vec3(0, -100.5f, -1), 100);
 	hitable *world = new hitable_list(list, 2);
 	
+	camera cam;
 	for (int j = ny - 1; j >= 0; --j)
 		for(int i = 0; i < nx; ++i)
 		{
-			float u = float(i) / float(nx);
-			float v = float(j) / float(ny);
-			
-			ray r(origin, lower_left_corner + u * horizontal + v * vertical);
+			vec3 col(0, 0, 0);
+			for (int s = 0; s < ns; ++s) {
+				float u = float(i + ((double)rand() / (RAND_MAX + 1))) / float(nx);
+				float v = float(j + ((double)rand() / (RAND_MAX + 1))) / float(ny);
 
-			//vec3 p = r.point_at_parameter(2.0f);
-			vec3 col = color(r, world);
+				ray r = cam.get_ray(u, v);
+
+				col += color(r, world);
+				//vec3 p = r.point_at_parameter(2.0f);
+			}
+			col /= float(ns);
 
 			int ir = int(255.99 * col[0]);
 			int ig = int(255.99 * col[1]);
