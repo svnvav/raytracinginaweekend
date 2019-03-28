@@ -26,22 +26,23 @@ vec3 color(const ray& r, hitable *world, int depth) {
 }
 
 int main() {
-	int nx = 512;
-	int ny = 256;
+	int nx = 1024;
+	int ny = 768;
 	int ns = 32;
 
 	ofstream outfile;
 	outfile.open("HelloWorld.ppm");
 	outfile << "P3\n" << nx << " " << ny << "\n255\n";
 
-	hitable *list[4];
+	hitable *list[5];
 	list[0] = new sphere(vec3(0, 0, -1), 0.5f, new lambertian(vec3(0.8f, 0.3f, 0.3f)));
 	list[1] = new sphere(vec3(0, -100.5f, -1), 100, new lambertian(vec3(0.8f, 0.8f, 0.0f)));
-	list[2] = new sphere(vec3(1, 0, -1), 0.5f, new metal(vec3(0.8f, 0.6f, 0.2f), 1.0f));
-	list[3] = new sphere(vec3(-1, 0, -1), 0.5f, new metal(vec3(0.9f, 0.9f, 0.9f), 0.3f));
-	hitable *world = new hitable_list(list, 4);
+	list[2] = new sphere(vec3(1, 0, -1), 0.5f, new metal(vec3(0.8f, 0.6f, 0.2f), 0.5f));
+	list[3] = new sphere(vec3(-1, 0, -1), 0.5f, new dielectric(1.5f));
+	list[4] = new sphere(vec3(-1, 0, -1), -0.45f, new dielectric(1.5f));
+	hitable *world = new hitable_list(list, 5);
 	
-	camera cam;
+	camera cam(vec3(-2.0f, 2.0f, 1.0f), vec3(0, 0, -1), vec3(0, 1, 0), 90, float(nx)/float(ny));
 	for (int j = ny - 1; j >= 0; --j)
 		for(int i = 0; i < nx; ++i)
 		{
