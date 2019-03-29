@@ -1,6 +1,10 @@
 #ifndef RAYH
-#define RAYH //нахер?
+#define RAYH
 #include "vec3.h"
+
+float rand01() {
+	return ((float)rand() / (RAND_MAX + 1));
+}
 
 class ray
 {

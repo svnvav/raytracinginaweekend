@@ -6,10 +6,6 @@ struct hit_record;
 #include "ray.h"
 #include "hitable.h"
 
-float rand01() {
-	return ((float)rand() / (RAND_MAX + 1));
-}
-
 vec3 random_in_unit_sphere() {
 	vec3 p;
 	do {
